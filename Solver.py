@@ -1,4 +1,5 @@
 from tkinter import *
+import re
 
 with open('fiveletterwords.txt', 'r') as f:
     temp_words = f.read().splitlines()
@@ -8,6 +9,7 @@ print(temp_words.__len__())
 #     print(word)
 # print(temp_words[0])
 # print(temp_words[0][0])
+# print(bool(re.search('['+'ace'+']', "abcdef")))
 
 
 def get_attempt():
@@ -15,9 +17,17 @@ def get_attempt():
     for letter_entry in letter_entries:
         letter = letter_entry.get()
         position = letter_entries.index(letter_entry)
+        no_no_letters = no_no_letters_entry.get()
+
+        # get rid of no no words
+        temp_words_copy = temp_words.copy()
+        for word in temp_words:
+            if bool(re.search('[' + no_no_letters + ']', word)):
+                temp_words_copy.remove(word)
+        temp_words = temp_words_copy
 
         if letter:
-            limit_words(letter, position, is_sures[position].get())
+            limit_words(letter, position, is_sures[position].get(), no_no_letters)
 
         # print(position, letter, is_sures[position].get())
 
@@ -27,7 +37,7 @@ def get_attempt():
     print("done")
 
 
-def limit_words(letter, position, is_sure):
+def limit_words(letter, position, is_sure, no_no_letters):
     global temp_words
     print("limiting ", letter, "...")
 
@@ -36,13 +46,13 @@ def limit_words(letter, position, is_sure):
         temp_words_copy = temp_words.copy()
 
         for word in temp_words:
-            if word[position] != letter:
+            if word[position] != letter or bool(re.search('['+no_no_letters+']', word)):
                 temp_words_copy.remove(word)
     else:
         # yellow letter
         temp_words_copy = []
         for word in temp_words:
-            if word[position] != letter and letter in word:
+            if word[position] != letter and letter in word and not bool(re.search('['+no_no_letters+']', word)):
                 temp_words_copy.append(word)
 
     temp_words = temp_words_copy
@@ -64,6 +74,8 @@ letter_entry4 = Entry(main_window)
 letter_entry4.pack()
 letter_entry5 = Entry(main_window)
 letter_entry5.pack()
+no_no_letters_entry = Entry(main_window)
+no_no_letters_entry.pack()
 
 letter_entries = [letter_entry1, letter_entry2, letter_entry3, letter_entry4, letter_entry5]
 
