@@ -36,6 +36,7 @@ def get_attempt():
     for word in temp_words:
         print(word)
     print("done")
+    solutions_var.set(temp_words)
 
 
 def limit_words(letter, position, is_sure, no_no_letters):
@@ -47,13 +48,13 @@ def limit_words(letter, position, is_sure, no_no_letters):
         temp_words_copy = temp_words.copy()
 
         for word in temp_words:
-            if word[position] != letter or bool(re.search('['+no_no_letters+']', word)):
+            if word[position] != letter or (no_no_letters and bool(re.search('['+no_no_letters+']', word))):
                 temp_words_copy.remove(word)
     else:
         # yellow letter
         temp_words_copy = []
         for word in temp_words:
-            if word[position] != letter and letter in word and not bool(re.search('['+no_no_letters+']', word)):
+            if word[position] != letter and letter in word and (no_no_letters and not bool(re.search('['+no_no_letters+']', word))):
                 temp_words_copy.append(word)
 
     temp_words = temp_words_copy
