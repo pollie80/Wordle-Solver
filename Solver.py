@@ -6,8 +6,8 @@ print(temp_words.__len__())
 
 # for word in temp_words:
 #     print(word)
-print(temp_words[0])
-print(temp_words[0][0])
+# print(temp_words[0])
+# print(temp_words[0][0])
 
 
 def get_attempt():
@@ -35,14 +35,14 @@ def limit_words(letter, position, is_sure):
         # green letter
         temp_words_copy = temp_words.copy()
 
-        for word in temp_words_copy:
-            if is_sure and word[position] != letter:
+        for word in temp_words:
+            if word[position] != letter:
                 temp_words_copy.remove(word)
     else:
         # yellow letter
         temp_words_copy = []
         for word in temp_words:
-            if not is_sure and word[position] != letter and letter in word:
+            if word[position] != letter and letter in word:
                 temp_words_copy.append(word)
 
     temp_words = temp_words_copy
