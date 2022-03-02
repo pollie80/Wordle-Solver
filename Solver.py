@@ -1,31 +1,59 @@
 from tkinter import *
 
 with open('fiveletterwords.txt', 'r') as f:
-    temp_words = f.readlines().copy()
+    temp_words = f.read().splitlines()
+print(temp_words.__len__())
 
-# print(temp_words[0])
+# for word in temp_words:
+#     print(word)
+print(temp_words[0])
+print(temp_words[0][0])
+
 
 def get_attempt():
-
+    global temp_words
     for letter_entry in letter_entries:
         letter = letter_entry.get()
         position = letter_entries.index(letter_entry)
 
-        # if letter_entry.get():
-        #     limit_words(letter, position, is_sure_checkboxes[position].getboolean())
+        if letter:
+            limit_words(letter, position, is_sures[position].get())
 
-        print(position, letter, is_sures[position].get())
+        # print(position, letter, is_sures[position].get())
+
+    print(temp_words.__len__())
+    for word in temp_words:
+        print(word)
+    print("done")
 
 
 def limit_words(letter, position, is_sure):
-    print("doodoo")
+    global temp_words
+    print("limiting ", letter, "...")
+
+    if is_sure:
+        # green letter
+        temp_words_copy = temp_words.copy()
+
+        for word in temp_words_copy:
+            if is_sure and word[position] != letter:
+                temp_words_copy.remove(word)
+    else:
+        # yellow letter
+        temp_words_copy = []
+        for word in temp_words:
+            if not is_sure and word[position] != letter and letter in word:
+                temp_words_copy.append(word)
+
+    temp_words = temp_words_copy
+
 
 # GUI
 main_window = Tk()
 main_window.geometry('400x400')
 main_window.title('Wordle Solver')
 
-## widgets
+# widgets
 letter_entry1 = Entry(main_window)
 letter_entry1.pack()
 letter_entry2 = Entry(main_window)
@@ -66,6 +94,6 @@ is_sures = [is_sure1, is_sure2, is_sure3, is_sure4, is_sure5]
 button = Button(main_window, text='Solve', command=get_attempt)
 button.pack()
 
-## show GUI
+# show GUI
 main_window.mainloop()
 
