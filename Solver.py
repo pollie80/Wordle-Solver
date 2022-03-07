@@ -5,15 +5,18 @@ with open('fiveletterwords.txt', 'r') as f:
     temp_words = f.read().splitlines()
 print(temp_words.__len__())
 
-# for word in temp_words:
-#     print(word)
+for word in temp_words:
+    print(word)
 # print(temp_words[0])
 # print(temp_words[0][0])
 # print(bool(re.search('['+'ace'+']', "abcdef")))
 
+# suggest:
+# letter_frequency = etaoinshrdlcumwfgypbvkjxqz
+
 
 def get_attempt():
-    global temp_words
+    global temp_words, letter_entries
     for letter_entry in letter_entries:
         letter = letter_entry.get()
         position = letter_entries.index(letter_entry)
