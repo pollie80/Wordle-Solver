@@ -126,3 +126,5 @@ dmypy.json
 *.xml
 
 .idea/
+
+/wordle-solver/node_modules/*
