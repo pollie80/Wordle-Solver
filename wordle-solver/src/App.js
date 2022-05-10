@@ -9,6 +9,8 @@ import { fiveletterwords } from "./fiveletterwords";
 function App() {
 	const [currentWord, setCurrentWord] = useState(["", "", "", "", ""]);
 	const [checked, setChecked] = useState([false, false, false, false, false]);
+	const [possibleWords, setPossibleWords] = useState(fiveletterwords);
+	const [nonoLetters, setNonoLetters] = useState([""]);
 
 	useEffect(() => {
 		fetch("./fiveletterwords.txt")
@@ -21,9 +23,54 @@ function App() {
 			});
 	}, []);
 
-	function checkLetters(params) {
+	function checkLetters() {
 		alert("checking");
+		// for (int i = 0; i < 5; i++) {
+
+		//     for letter_entry in letter_entries:
+		//         letter = letter_entry.get()
+		//         position = letter_entries.index(letter_entry)
+		//         no_no_letters = no_no_letters_entry.get()
+
+		//         # get rid of no no words
+		//         if no_no_letters:
+		//             temp_words_copy = temp_words.copy()
+		//             for word in temp_words:
+		//                 if bool(re.search('[' + no_no_letters + ']', word)):
+		//                     temp_words_copy.remove(word)
+		//             temp_words = temp_words_copy
+
+		//         if letter:
+		//             limit_words(letter, position, is_sures[position].get(), no_no_letters)
+
+		//         # print(position, letter, is_sures[position].get())
+
+		//     print(temp_words.__len__())
+		//     for word in temp_words:
+		//         print(word)
+		//     print("done")
+		//     solutions_var.set(temp_words)
 	}
+
+	// def limit_words(letter, position, is_sure, no_no_letters):
+	//     global temp_words
+	//     print("limiting ", letter, "...")
+
+	//     if is_sure:
+	//         # green letter
+	//         temp_words_copy = temp_words.copy()
+
+	//         for word in temp_words:
+	//             if word[position] != letter or (no_no_letters and bool(re.search('['+no_no_letters+']', word))):
+	//                 temp_words_copy.remove(word)
+	//     else:
+	//         # yellow letter
+	//         temp_words_copy = []
+	//         for word in temp_words:
+	//             if word[position] != letter and letter in word and (no_no_letters and not bool(re.search('['+no_no_letters+']', word))):
+	//                 temp_words_copy.append(word)
+
+	//     temp_words = temp_words_copy
 
 	function handleLetterChange(event, position) {
 		let newWord = [...currentWord];
@@ -119,6 +166,17 @@ function App() {
 					<Checkbox
 						checked={checked[4]}
 						onChange={(event) => handleCheckBoxChange(event, 4)}
+					/>
+				</Grid>
+				<Grid item xs={12}>
+					<TextField
+						type="text"
+						id="nonoletters"
+						placeholder="Enter the nono letters"
+						value={nonoLetters.join("").toString()}
+						onChange={(event) => {
+							setNonoLetters(...nonoLetters, event.target.value);
+						}}
 					/>
 				</Grid>
 			</Grid>
