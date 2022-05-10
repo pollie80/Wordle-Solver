@@ -1,13 +1,25 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import { TextField, Typography } from "@mui/material";
 import Checkbox from "@material-ui/core/Checkbox";
+import React from "react";
+import { fiveletterwords } from "./fiveletterwords";
 
 function App() {
 	const [currentWord, setCurrentWord] = useState(["", "", "", "", ""]);
 	const [checked, setChecked] = useState([false, false, false, false, false]);
-	const [possibleWords, setPossibleWords] = useState(["brain", "whats"]);
+
+	useEffect(() => {
+		fetch("./fiveletterwords.txt")
+			.then((r) => r.text())
+			.then((text) => {
+				console.log(text);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}, []);
 
 	function checkLetters(params) {
 		alert("checking");
@@ -112,8 +124,8 @@ function App() {
 			</Grid>
 
 			<button onClick={() => checkLetters(currentWord)}>Check</button>
-			<Typography variant="h6">
-				{possibleWords.map((word) => (
+			<Typography>
+				{fiveletterwords.slice(0, 20).map((word) => (
 					<li key={word}>{word}</li>
 				))}
 			</Typography>

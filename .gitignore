@@ -128,3 +128,4 @@ dmypy.json
 .idea/
 
 /wordle-solver/node_modules/*
+.DS_Store
