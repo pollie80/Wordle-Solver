@@ -12,6 +12,8 @@ function App() {
 	const [checked, setChecked] = useState([false, false, false, false, false]);
 	const [possibleWords, setPossibleWords] = useState(fiveletterwords);
 	const [nonoLetters, setNonoLetters] = useState([]);
+	const [showHelp, setShowHelp] = useState(false);
+	const numbersAsLetters = ["first", "second", "third", "fourth", "fifth"];
 
 	useEffect(() => {
 		fetch("./fiveletterwords.txt")
@@ -84,16 +86,44 @@ function App() {
 	return (
 		<div className="App">
 			<h1>Wordle Solver</h1>
+			<Button onClick={() => setShowHelp(!showHelp)}>
+				{showHelp ? "Hide Help" : "Show Help"}
+			</Button>
+			{showHelp && (
+				<Typography maxWidth={"90%"}>
+					How to use this website:
+					<ol>
+						<li>
+							Guess a word in Wordle, then enter the word you
+							guessed into the according boxes below.
+						</li>
+						<li>
+							Check the boxes if you know the letter is (green) in
+							the right position.
+						</li>
+						<li>
+							Uncheck the boxes if you know the letter is (yellow)
+							in the word but in wrong position.
+						</li>
+						<li>
+							Enter the letters you know are not in the word into
+							the nono letters box.
+						</li>
+					</ol>
+				</Typography>
+			)}
 			<Grid container spacing={2}>
-				{/* for every letter in currentWord */}
 				{currentWord.map((letter, i) => (
-					// create a grid item
 					<Grid container item xs={12} key={i}>
 						<Grid item xs={8}>
 							<TextField
 								type="text"
 								id="l1"
-								placeholder="Enter the first letter"
+								placeholder={
+									"Enter the " +
+									numbersAsLetters[i] +
+									" letter"
+								}
 								maxLength={1}
 								value={letter}
 								onChange={(event) =>
@@ -107,74 +137,11 @@ function App() {
 								onChange={(event) =>
 									handleCheckBoxChange(event, i)
 								}
+								style={{ color: "green" }}
 							/>
 						</Grid>
 					</Grid>
 				))}
-				{/* <Grid item xs={8}>
-					<TextField
-						type="text"
-						id="l2"
-						placeholder="Enter the second letter"
-						maxLength={1}
-						value={currentWord[1]}
-						onChange={(event) => handleLetterChange(event, 1)}
-					/>
-				</Grid>
-				<Grid item xs={4}>
-					<Checkbox
-						checked={checked[1]}
-						onChange={(event) => handleCheckBoxChange(event, 1)}
-					/>
-				</Grid>
-				<Grid item xs={8}>
-					<TextField
-						type="text"
-						id="l3"
-						placeholder="Enter the third letter"
-						maxLength={1}
-						value={currentWord[2]}
-						onChange={(event) => handleLetterChange(event, 2)}
-					/>
-				</Grid>
-				<Grid item xs={4}>
-					<Checkbox
-						checked={checked[2]}
-						onChange={(event) => handleCheckBoxChange(event, 2)}
-					/>
-				</Grid>
-				<Grid item xs={8}>
-					<TextField
-						type="text"
-						id="l4"
-						placeholder="Enter the fourth letter"
-						maxLength={1}
-						value={currentWord[3]}
-						onChange={(event) => handleLetterChange(event, 3)}
-					/>
-				</Grid>
-				<Grid item xs={4}>
-					<Checkbox
-						checked={checked[3]}
-						onChange={(event) => handleCheckBoxChange(event, 3)}
-					/>
-				</Grid>
-				<Grid item xs={8}>
-					<TextField
-						type="text"
-						id="l5"
-						placeholder="Enter the fifth letter"
-						maxLength={1}
-						value={currentWord[4]}
-						onChange={(event) => handleLetterChange(event, 4)}
-					/>
-				</Grid>
-				<Grid item xs={4}>
-					<Checkbox
-						checked={checked[4]}
-						onChange={(event) => handleCheckBoxChange(event, 4)}
-					/>
-				</Grid> */}
 				<Grid item xs={12}>
 					<TextField
 						type="text"
