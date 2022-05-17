@@ -173,9 +173,9 @@ function App() {
 						type="text"
 						id="nonoletters"
 						placeholder="Enter the nono letters"
-						value={nonoLetters.join("").toString()}
+						value={nonoLetters.toString()}
 						onChange={(event) => {
-							setNonoLetters(...nonoLetters, event.target.value);
+							setNonoLetters(event.target.value);
 						}}
 					/>
 				</Grid>
