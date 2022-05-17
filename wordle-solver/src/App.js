@@ -10,7 +10,7 @@ function App() {
 	const [currentWord, setCurrentWord] = useState(["", "", "", "", ""]);
 	const [checked, setChecked] = useState([false, false, false, false, false]);
 	const [possibleWords, setPossibleWords] = useState(fiveletterwords);
-	const [nonoLetters, setNonoLetters] = useState([""]);
+	const [nonoLetters, setNonoLetters] = useState([]);
 
 	useEffect(() => {
 		fetch("./fiveletterwords.txt")
@@ -24,53 +24,49 @@ function App() {
 	}, []);
 
 	function checkLetters() {
+		console.log("start", possibleWords.length);
 		alert("checking");
-		// for (int i = 0; i < 5; i++) {
+		let possibleWordsCopy = [...possibleWords];
 
-		//     for letter_entry in letter_entries:
-		//         letter = letter_entry.get()
-		//         position = letter_entries.index(letter_entry)
-		//         no_no_letters = no_no_letters_entry.get()
+		if (nonoLetters.length > 0) {
+			//print empty
+			console.log("nonoLetters exist");
+			//get rid of words that include nono letters
+			for (let j = 0; j < nonoLetters.length; j++) {
+				let nonoLetter = nonoLetters[j];
+				let newPossibleWords = possibleWordsCopy.filter(
+					(word) => !word.includes(nonoLetter)
+				);
+				possibleWordsCopy = newPossibleWords;
+			}
+		} else {
+			console.log("nonoLetters do not exist");
+		}
 
-		//         # get rid of no no words
-		//         if no_no_letters:
-		//             temp_words_copy = temp_words.copy()
-		//             for word in temp_words:
-		//                 if bool(re.search('[' + no_no_letters + ']', word)):
-		//                     temp_words_copy.remove(word)
-		//             temp_words = temp_words_copy
+		//only keep words that have all the letters in the right positions and if they are checked
+		possibleWordsCopy = possibleWordsCopy.filter((word) => {
+			let aLetterIsWrong = false;
+			for (let i = 0; i < 5; i++) {
+				//check ticked letter
+				if (checked[i] === true) {
+					if (word[i] !== currentWord[i]) aLetterIsWrong = true;
+				}
+				//check unticked letter
+				else {
+					if (currentWord[i] !== "") {
+						if (word[i] === currentWord[i]) aLetterIsWrong = true;
+					}
+				}
+			}
+			return !aLetterIsWrong;
+		});
 
-		//         if letter:
-		//             limit_words(letter, position, is_sures[position].get(), no_no_letters)
+		//
 
-		//         # print(position, letter, is_sures[position].get())
-
-		//     print(temp_words.__len__())
-		//     for word in temp_words:
-		//         print(word)
-		//     print("done")
-		//     solutions_var.set(temp_words)
+		alert("done");
+		setPossibleWords(possibleWordsCopy);
+		console.log("end", possibleWordsCopy.length);
 	}
-
-	// def limit_words(letter, position, is_sure, no_no_letters):
-	//     global temp_words
-	//     print("limiting ", letter, "...")
-
-	//     if is_sure:
-	//         # green letter
-	//         temp_words_copy = temp_words.copy()
-
-	//         for word in temp_words:
-	//             if word[position] != letter or (no_no_letters and bool(re.search('['+no_no_letters+']', word))):
-	//                 temp_words_copy.remove(word)
-	//     else:
-	//         # yellow letter
-	//         temp_words_copy = []
-	//         for word in temp_words:
-	//             if word[position] != letter and letter in word and (no_no_letters and not bool(re.search('['+no_no_letters+']', word))):
-	//                 temp_words_copy.append(word)
-
-	//     temp_words = temp_words_copy
 
 	function handleLetterChange(event, position) {
 		let newWord = [...currentWord];
@@ -182,8 +178,8 @@ function App() {
 			</Grid>
 
 			<button onClick={() => checkLetters(currentWord)}>Check</button>
-			<Typography>
-				{fiveletterwords.slice(0, 20).map((word) => (
+			<Typography style={{ maxHeight: 200, overflow: "auto" }}>
+				{possibleWords.slice(0, 20).map((word) => (
 					<li key={word}>{word}</li>
 				))}
 			</Typography>
