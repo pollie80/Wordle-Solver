@@ -74,6 +74,7 @@ function App() {
 	function handleLetterChange(event, position) {
 		let newWord = [...currentWord];
 		newWord[position] = event.target.value;
+		newWord[position] = newWord[position].toLowerCase();
 		setCurrentWord(newWord);
 	}
 
@@ -149,7 +150,7 @@ function App() {
 						placeholder="Enter the nono letters"
 						value={nonoLetters.toString()}
 						onChange={(event) => {
-							setNonoLetters(event.target.value);
+							setNonoLetters(event.target.value.toLowerCase());
 						}}
 						fullWidth
 					/>
