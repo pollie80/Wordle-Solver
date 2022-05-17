@@ -5,6 +5,7 @@ import { TextField, Typography } from "@mui/material";
 import Checkbox from "@material-ui/core/Checkbox";
 import React from "react";
 import { fiveletterwords } from "./fiveletterwords";
+import { Button } from "@material-ui/core";
 
 function App() {
 	const [currentWord, setCurrentWord] = useState(["", "", "", "", ""]);
@@ -25,7 +26,6 @@ function App() {
 
 	function checkLetters() {
 		console.log("start", possibleWords.length);
-		alert("checking");
 		let possibleWordsCopy = [...possibleWords];
 
 		if (nonoLetters.length > 0) {
@@ -47,23 +47,24 @@ function App() {
 		possibleWordsCopy = possibleWordsCopy.filter((word) => {
 			let aLetterIsWrong = false;
 			for (let i = 0; i < 5; i++) {
+				//if there is no currentWord letter, skip it
+				if (currentWord[i] === "") continue;
 				//check ticked letter
 				if (checked[i] === true) {
 					if (word[i] !== currentWord[i]) aLetterIsWrong = true;
 				}
 				//check unticked letter
 				else {
-					if (currentWord[i] !== "") {
-						if (word[i] === currentWord[i]) aLetterIsWrong = true;
-					}
+					if (
+						word[i] === currentWord[i] ||
+						!word.includes(currentWord[i])
+					)
+						aLetterIsWrong = true;
 				}
 			}
 			return !aLetterIsWrong;
 		});
 
-		//
-
-		alert("done");
 		setPossibleWords(possibleWordsCopy);
 		console.log("end", possibleWordsCopy.length);
 	}
@@ -84,23 +85,33 @@ function App() {
 		<div className="App">
 			<h1>Wordle Solver</h1>
 			<Grid container spacing={2}>
-				<Grid item xs={8}>
-					<TextField
-						type="text"
-						id="l1"
-						placeholder="Enter the first letter"
-						maxLength={1}
-						value={currentWord[0]}
-						onChange={(event) => handleLetterChange(event, 0)}
-					/>
-				</Grid>
-				<Grid item xs={4}>
-					<Checkbox
-						checked={checked[0]}
-						onChange={(event) => handleCheckBoxChange(event, 0)}
-					/>
-				</Grid>
-				<Grid item xs={8}>
+				{/* for every letter in currentWord */}
+				{currentWord.map((letter, i) => (
+					// create a grid item
+					<Grid container item xs={12} key={i}>
+						<Grid item xs={8}>
+							<TextField
+								type="text"
+								id="l1"
+								placeholder="Enter the first letter"
+								maxLength={1}
+								value={letter}
+								onChange={(event) =>
+									handleLetterChange(event, i)
+								}
+							/>
+						</Grid>
+						<Grid item xs={4}>
+							<Checkbox
+								checked={checked[i]}
+								onChange={(event) =>
+									handleCheckBoxChange(event, i)
+								}
+							/>
+						</Grid>
+					</Grid>
+				))}
+				{/* <Grid item xs={8}>
 					<TextField
 						type="text"
 						id="l2"
@@ -163,7 +174,7 @@ function App() {
 						checked={checked[4]}
 						onChange={(event) => handleCheckBoxChange(event, 4)}
 					/>
-				</Grid>
+				</Grid> */}
 				<Grid item xs={12}>
 					<TextField
 						type="text"
@@ -173,12 +184,22 @@ function App() {
 						onChange={(event) => {
 							setNonoLetters(event.target.value);
 						}}
+						fullWidth
 					/>
 				</Grid>
 			</Grid>
 
-			<button onClick={() => checkLetters(currentWord)}>Check</button>
-			<Typography style={{ maxHeight: 200, overflow: "auto" }}>
+			<Button
+				variant="contained"
+				onClick={() => checkLetters(currentWord)}
+				style={{ marginTop: "10px" }}
+			>
+				Check for words
+			</Button>
+			<Typography
+				style={{ marginTop: "10px", maxHeight: 300, overflow: "auto" }}
+			>
+				Possible words:
 				{possibleWords.slice(0, 20).map((word) => (
 					<li key={word}>{word}</li>
 				))}
