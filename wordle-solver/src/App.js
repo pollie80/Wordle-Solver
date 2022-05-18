@@ -91,25 +91,26 @@ function App() {
 				{showHelp ? "Hide Help" : "Show Help"}
 			</Button>
 			{showHelp && (
-				<Typography maxWidth={"90%"}>
+				<Typography maxWidth={"97.5%"}>
 					How to use this website:
 					<ol>
 						<li>
-							Guess a word in Wordle, then enter the word you
-							guessed into the according boxes below.
+							Guess a word in Wordle, then enter the letters from
+							the word you guessed into the according boxes below.
 						</li>
 						<li>
-							Check the boxes if you know the letter is (green) in
-							the right position.
+							Check the letter's box if you know the letter is
+							(green) in the right position.
 						</li>
 						<li>
-							Uncheck the boxes if you know the letter is (yellow)
-							in the word but in wrong position.
+							Uncheck the letter's box if you know the letter is
+							(yellow) in the word but in wrong position.
 						</li>
 						<li>
 							Enter the letters you know are not in the word into
 							the nono letters box.
 						</li>
+						<li>Do this after every guess!</li>
 					</ol>
 				</Typography>
 			)}
