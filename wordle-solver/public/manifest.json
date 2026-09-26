@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Wordle Solver",
+  "name": "Wordle Solver",
   "icons": [
     {
       "src": "w_photo.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#121213",
+  "background_color": "#121213"
 }
