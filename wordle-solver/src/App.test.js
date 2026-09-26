@@ -39,3 +39,26 @@ test("backspace removes letters and New game clears the board", () => {
 	fireEvent.click(screen.getByRole("button", { name: /new game/i }));
 	expect(within(board).queryAllByRole("button", { name: /tap to change colour/i })).toHaveLength(0);
 });
+
+test("words listed as possible answers always fit the clues", async () => {
+	// The board from a bug report: WATER and COILS with only E and L yellow
+	localStorage.setItem(
+		"ws.rows",
+		JSON.stringify([
+			{ letters: "water", colours: [0, 0, 0, 1, 0] },
+			{ letters: "coils", colours: [0, 0, 0, 1, 0] },
+		])
+	);
+	render(<App />);
+	const heading = await screen.findByRole("heading", { name: /could be the answer/i });
+	const list = heading.nextElementSibling;
+	const words = within(list)
+		.getAllByRole("button")
+		.map((b) => b.querySelector(".word").textContent);
+	expect(words.length).toBeGreaterThan(0);
+	for (const w of words) {
+		expect(w).not.toMatch(/[watrcois]/); // greys never appear
+		expect(w).toMatch(/e/);
+		expect(w).toMatch(/l/);
+	}
+});

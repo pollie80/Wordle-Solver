@@ -31,6 +31,9 @@ const OPENERS = {
 
 // Upper bound on guess-vs-answer comparisons per ranking, to keep it snappy.
 const WORK_BUDGET = 2500000;
+// A can't-be-the-answer word must leave at most this fraction of the words the
+// best possible answer would leave before it's worth suggesting.
+const PROBE_ADVANTAGE = 0.75;
 const MAX_ROWS = 6;
 const ANSWER_PAGE = 60;
 const COLOUR_NAMES = ["grey", "yellow", "green"];
@@ -57,6 +60,42 @@ function validRows(rows) {
 		Array.isArray(rows) &&
 		rows.length > 0 &&
 		rows.every((r) => typeof r.letters === "string" && Array.isArray(r.colours))
+	);
+}
+
+function formatLeft(expected) {
+	if (expected === 0) return "0 left";
+	return `~${expected < 10 ? expected.toFixed(1) : Math.round(expected)} left`;
+}
+
+// One ranked group of suggested guesses. `scale` holds both groups so their
+// bars share one scale and can be compared at a glance.
+function GuessList({ items, scale, onPick, probe = false }) {
+	const all = [...scale.candidates, ...scale.probes].map((s) => s.expected);
+	const best = Math.min(...all);
+	const worst = Math.max(...all);
+	return (
+		<ol className={probe ? "probes" : undefined}>
+			{items.map((s, i) => {
+				const width = worst === best ? 100 : 100 - ((s.expected - best) / (worst - best)) * 55;
+				return (
+					<li key={s.word}>
+						<button
+							className="guess"
+							onClick={() => onPick(s.word)}
+							title={probe ? "Can't be the answer, but narrows it down" : "Use this word"}
+						>
+							<span className="rank">{i + 1}</span>
+							<span className="word">{s.word}</span>
+							<span className="meter" aria-hidden="true">
+								<span style={{ width: `${width}%` }} />
+							</span>
+							<span className="left">{formatLeft(s.expected)}</span>
+						</button>
+					</li>
+				);
+			})}
+		</ol>
 	);
 }
 
@@ -92,14 +131,22 @@ function App() {
 		if (!hasGuesses) return;
 		const id = setTimeout(() => {
 			const n = matches.length;
-			let pool;
-			if (n <= 2 || hardMode) pool = matches;
-			else if (n * WORDS.length <= WORK_BUDGET) pool = WORDS;
-			else {
-				const extra = WORDS.slice(0, Math.floor(WORK_BUDGET / n));
-				pool = Array.from(new Set([...matches.slice(0, 300), ...extra]));
+			const cap = (pool) => (n * pool.length <= WORK_BUDGET ? pool : pool.slice(0, Math.floor(WORK_BUDGET / n)));
+
+			// Words that could be the answer, best splitters first
+			const candidates = rankGuesses(matches, cap(matches), 8);
+
+			// Words that can't be the answer but split the rest better. They
+			// cost a guess with no chance of winning, so only offer them when
+			// they are clearly better than the best possible answer.
+			let probes = [];
+			if (!hardMode && n > 2) {
+				const isMatch = new Set(matches);
+				const pool = cap(WORDS).filter((w) => !isMatch.has(w));
+				const bar = candidates.length ? candidates[0].expected * PROBE_ADVANTAGE : Infinity;
+				probes = rankGuesses(matches, pool, 5).filter((p) => p.expected < bar);
 			}
-			setRanked({ matches, hardMode, list: rankGuesses(matches, pool, 12) });
+			setRanked({ matches, hardMode, candidates, probes });
 		}, 30);
 		return () => clearTimeout(id);
 	}, [hasGuesses, matches, hardMode]);
@@ -108,13 +155,12 @@ function App() {
 
 	let suggestions; // undefined while a ranking is being computed
 	if (!hasGuesses) {
-		suggestions = OPENERS[hideRare ? "common" : "all"].map(([word, expected]) => ({
-			word,
-			expected,
-			isCandidate: true,
-		}));
+		suggestions = {
+			candidates: OPENERS[hideRare ? "common" : "all"].map(([word, expected]) => ({ word, expected })),
+			probes: [],
+		};
 	} else if (ranked && ranked.matches === matches && ranked.hardMode === hardMode) {
-		suggestions = ranked.list;
+		suggestions = ranked;
 	}
 
 	/* ---------- Board editing ---------- */
@@ -404,7 +450,7 @@ function App() {
 						{tab === "guesses" && completeRows.length > 0 && (
 							<label>
 								<input type="checkbox" checked={hardMode} onChange={(e) => setHardMode(e.target.checked)} />
-								Hard mode (only words that fit the clues)
+								Hard mode (only suggest possible answers)
 							</label>
 						)}
 					</div>
@@ -413,40 +459,32 @@ function App() {
 						<div className="guess-list">
 							{suggestions === undefined ? (
 								<p className="muted">Crunching the numbers…</p>
-							) : suggestions && suggestions.length ? (
+							) : suggestions.candidates.length === 0 ? (
+								<p className="muted">Nothing to suggest yet.</p>
+							) : (
 								<>
 									<p className="muted small">
-										Ranked by how many words are left on average after guessing. Lower is better.
+										Ranked by how many words would be left on average after playing it. Lower is better.
 									</p>
-									<ol>
-										{suggestions.map((s, i) => {
-											const best = suggestions[0].expected || 1;
-											const worst = Math.max(suggestions[suggestions.length - 1].expected, best);
-											const width = worst === best ? 100 : 100 - ((s.expected - best) / (worst - best)) * 55;
-											return (
-												<li key={s.word}>
-													<button className="guess" onClick={() => pickWord(s.word)} title="Use this word">
-														<span className="rank">{i + 1}</span>
-														<span className="word">{s.word}</span>
-														<span className="meter" aria-hidden="true">
-															<span style={{ width: `${width}%` }} />
-														</span>
-														<span className="left">
-															{s.expected === 0
-																? "0 left"
-																: `~${s.expected < 10 ? s.expected.toFixed(1) : Math.round(s.expected)} left`}
-														</span>
-														{completeRows.length > 0 && s.isCandidate && (
-															<span className="tag">could be it</span>
-														)}
-													</button>
-												</li>
-											);
-										})}
-									</ol>
+									{hasGuesses && <h2 className="group">Could be the answer</h2>}
+									<GuessList items={suggestions.candidates} scale={suggestions} onPick={pickWord} />
+
+									{suggestions.probes.length > 0 && (
+										<>
+											<h2 className="group">Or narrow it down first</h2>
+											<p className="muted small">
+												These <b>can't be the answer</b>, but they test more letters, so they split the
+												remaining words better. Handy when you have guesses to spare.
+											</p>
+											<GuessList
+												items={suggestions.probes}
+												scale={suggestions}
+												onPick={pickWord}
+												probe
+											/>
+										</>
+									)}
 								</>
-							) : (
-								<p className="muted">Nothing to suggest yet.</p>
 							)}
 						</div>
 					) : (

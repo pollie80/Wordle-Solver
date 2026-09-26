@@ -308,7 +308,7 @@
 .guess {
 	width: 100%;
 	display: grid;
-	grid-template-columns: 22px 72px 1fr auto auto;
+	grid-template-columns: 22px 72px 1fr auto;
 	align-items: center;
 	gap: 10px;
 	background: var(--surface-2);
@@ -348,16 +348,31 @@
 	color: var(--muted);
 	white-space: nowrap;
 }
-.tag {
-	font-size: 0.7rem;
+.group {
+	font-size: 0.8rem;
 	font-weight: 700;
 	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	color: var(--tile-text);
-	background: var(--green);
-	border-radius: 999px;
-	padding: 2px 8px;
-	white-space: nowrap;
+	letter-spacing: 0.08em;
+	color: var(--muted);
+	margin: 16px 0 8px;
+}
+.group:first-of-type {
+	margin-top: 4px;
+}
+.guess-list ol + .group {
+	margin-top: 22px;
+	padding-top: 16px;
+	border-top: 1px solid var(--border);
+}
+.probes .guess {
+	background: transparent;
+	border: 1px dashed var(--border);
+}
+.probes .guess .word {
+	color: var(--muted);
+}
+.probes .meter span {
+	background: var(--muted);
 }
 
 /* Answer chips */
@@ -429,7 +444,7 @@
 		font-size: 1.6rem;
 	}
 	.guess {
-		grid-template-columns: 18px 64px 1fr auto;
+		grid-template-columns: 18px 64px auto;
 		gap: 8px;
 	}
 	.guess .meter {
